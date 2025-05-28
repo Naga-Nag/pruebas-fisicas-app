@@ -71,19 +71,32 @@
     penalizacion = calcularPenalizacion(altura, peso, cc, sexo);
   }
 
-  function evaluarTabla(valor: number, fila: any): number {
-    for (const k of ["100", "92", "80", "72", "52", "40", "32", "20", "10"]) {
-      if (valor >= fila[k]) return Number(k);
-    }
-    return 0;
-  }
+  // ...existing code...
+function evaluarTabla(valor: number, fila: any): number {
+  // Filtra solo claves numéricas y las ordena de mayor a menor
+  const puntajes = Object.keys(fila)
+    .filter(k => !isNaN(Number(k)))
+    .map(Number)
+    .sort((a, b) => b - a);
 
-  function evaluarTablaFloat(valor: number, fila: any): number {
-    for (const k of ["100", "92", "80", "72", "52", "40", "32", "20", "10"]) {
-      if (valor >= parseFloat(fila[k])) return Number(k);
-    }
-    return 0;
+  for (const k of puntajes) {
+    if (valor >= fila[k]) return k;
   }
+  return 0;
+}
+
+function evaluarTablaFloat(valor: number, fila: any): number {
+  const puntajes = Object.keys(fila)
+    .filter(k => !isNaN(Number(k)))
+    .map(Number)
+    .sort((a, b) => b - a);
+
+  for (const k of puntajes) {
+    if (valor >= parseFloat(fila[k])) return k;
+  }
+  return 0;
+}
+// ...existing code...
 
   function resetCampos() {
     edad = 0;
