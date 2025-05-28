@@ -96,6 +96,12 @@
     pierna = "";
     cabo = false;
     resultado = "";
+    altura = 0;
+    peso = 0;
+    imc = 0;
+    imcTexto = "";
+    cc = 0;
+    penalizacion = 0;
   }
 
   function evaluar() {
