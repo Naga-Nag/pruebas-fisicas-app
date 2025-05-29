@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { calcularPenalizacion, calcularIMC } from "./utils";
-  import { base } from '$app/paths';
+  import { base } from "$app/paths";
 
   type Sexo = "masculino" | "femenino";
 
@@ -9,11 +9,11 @@
   let añoNacimiento = "";
   let sexo: Sexo = "masculino";
 
-  let altura = 0;
-  let peso = 0;
-  let imc = 0;
+  let altura: number | null = null;
+  let peso: number | null = null;
+  let imc: number | null = null;
   let imcTexto = "";
-  let cc = 0;
+  let cc: number | null = null;
   let penalizacion = 0;
 
   let correr2400 = "";
@@ -63,19 +63,14 @@
       imcTexto = "IMC inválido";
     }
 
-    if (cc > 0) {
+    if (cc && altura && peso) {
       penalizacion = calcularPenalizacion(altura, peso, cc, sexo);
     }
   }
 
-  function actualizarPenalizacion() {
-    penalizacion = calcularPenalizacion(altura, peso, cc, sexo);
-  }
-
   function evaluarTabla(valor: number, fila: any): number {
-    // Filtra solo claves numéricas y las ordena de mayor a menor
     const puntajes = Object.keys(fila)
-      .filter(k => !isNaN(Number(k)))
+      .filter((k) => !isNaN(Number(k)))
       .map(Number)
       .sort((a, b) => b - a);
 
@@ -87,7 +82,7 @@
 
   function evaluarTablaFloat(valor: number, fila: any): number {
     const puntajes = Object.keys(fila)
-      .filter(k => !isNaN(Number(k)))
+      .filter((k) => !isNaN(Number(k)))
       .map(Number)
       .sort((a, b) => b - a);
 
@@ -168,7 +163,10 @@
     const fuerza = (pbrazo + pabd + pbarra) / 3;
     let puntajeFinal = (p2400 * 3 + fuerza * 2 + ppierna) / 6;
     if (!cabo) puntajeFinal -= 10;
-    penalizacion = calcularPenalizacion(altura, peso, cc, sexo);
+
+    if (altura && peso && cc) {
+      penalizacion = calcularPenalizacion(altura, peso, cc, sexo);
+    }
     puntajeFinal += penalizacion;
 
     let estado =
@@ -248,7 +246,7 @@ Puntaje Final Redondeado: ${Math.round(puntajeFinal).toFixed(1)} → ${estado}
       {/if}
     </div>
     <div class="col-izquierda">
-      <label for="correr2400">Tiempo 2400m (mm:ss):</label>
+      <label for="correr2400">Tiempo 2400m (mm:ss)</label>
       <input bind:value={correr2400} placeholder="10:30" type="text" />
 
       <label for="flexionesBrazo">Flexiones de brazo:</label>
@@ -282,7 +280,7 @@ Puntaje Final Redondeado: ${Math.round(puntajeFinal).toFixed(1)} → ${estado}
     font-family: Comfortaa;
     font-style: normal;
     font-weight: 400;
-    src: url("/Comfortaa.ttf");
+    src: url("Comfortaa.ttf");
   }
 
   :global(body) {
