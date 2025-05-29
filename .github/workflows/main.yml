@@ -12,27 +12,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - uses: pnpm/action-setup@v2
-        name: Install pnpm
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v1
         with:
-          version: 8
-          run_install: false
-
-      - name: Install Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          cache: 'pnpm'
+          bun-version: latest
 
       - name: Install dependencies
-        run: pnpm install
+        run: bun install
 
       - name: Build with base path for GitHub Pages
         env:
           BASE_PATH: '/${{ github.event.repository.name }}'
         run: |
           echo "VITE_BASE_PATH=$BASE_PATH" >> .env
-          pnpm run build
+          bun run build
 
       - name: Deploy to gh-pages branch
         uses: peaceiris/actions-gh-pages@v3
