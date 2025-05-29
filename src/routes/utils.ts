@@ -1,5 +1,7 @@
-export function calcularIMC(peso: number, altura: number): { imc: number; clasificacion: string } {
-  const imc = peso / (altura * altura);
+export function calcularIMC(peso: number, alturaCm: number): { imc: number; clasificacion: string } {
+  // Convertir altura de centímetros a metros
+  const alturaM = alturaCm / 100;
+  const imc = peso / (alturaM * alturaM);
   let clasificacion = "";
   if (imc < 18.5) clasificacion = "Bajo peso";
   else if (imc < 25) clasificacion = "Normal";
@@ -8,12 +10,13 @@ export function calcularIMC(peso: number, altura: number): { imc: number; clasif
   return { imc, clasificacion };
 }
 
-export function calcularPenalizacion(altura: number, peso: number, cc: number, sexo: string): number {
+export function calcularPenalizacion(alturaCm: number, peso: number, cc: number, sexo: string): number {
   let penal = 0;
-  let imcTexto = "";
 
-  if (!isNaN(altura) && altura > 0 && !isNaN(peso)) {
-    const { imc } = calcularIMC(peso, altura);
+  // Convertir altura de centímetros a metros para el cálculo del IMC
+  if (!isNaN(alturaCm) && alturaCm > 0 && !isNaN(peso)) {
+    const alturaM = alturaCm / 100;
+    const { imc } = calcularIMC(peso, alturaCm);
 
     if (imc >= 30) {
       penal -= 3;

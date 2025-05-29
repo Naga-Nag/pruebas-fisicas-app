@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { calcularPenalizacion, calcularIMC } from "./utils";
+  import { base } from '$app/paths';
 
   type Sexo = "masculino" | "femenino";
 
@@ -26,7 +27,7 @@
   let datos: any = null;
 
   onMount(async () => {
-    const res = await fetch("/pruebas_fisicas.json");
+    const res = await fetch(`${base}/pruebas_fisicas.json`);
     datos = await res.json();
   });
 
@@ -71,32 +72,30 @@
     penalizacion = calcularPenalizacion(altura, peso, cc, sexo);
   }
 
-  // ...existing code...
-function evaluarTabla(valor: number, fila: any): number {
-  // Filtra solo claves numéricas y las ordena de mayor a menor
-  const puntajes = Object.keys(fila)
-    .filter(k => !isNaN(Number(k)))
-    .map(Number)
-    .sort((a, b) => b - a);
+  function evaluarTabla(valor: number, fila: any): number {
+    // Filtra solo claves numéricas y las ordena de mayor a menor
+    const puntajes = Object.keys(fila)
+      .filter(k => !isNaN(Number(k)))
+      .map(Number)
+      .sort((a, b) => b - a);
 
-  for (const k of puntajes) {
-    if (valor >= fila[k]) return k;
+    for (const k of puntajes) {
+      if (valor >= fila[k]) return k;
+    }
+    return 0;
   }
-  return 0;
-}
 
-function evaluarTablaFloat(valor: number, fila: any): number {
-  const puntajes = Object.keys(fila)
-    .filter(k => !isNaN(Number(k)))
-    .map(Number)
-    .sort((a, b) => b - a);
+  function evaluarTablaFloat(valor: number, fila: any): number {
+    const puntajes = Object.keys(fila)
+      .filter(k => !isNaN(Number(k)))
+      .map(Number)
+      .sort((a, b) => b - a);
 
-  for (const k of puntajes) {
-    if (valor >= parseFloat(fila[k])) return k;
+    for (const k of puntajes) {
+      if (valor >= parseFloat(fila[k])) return k;
+    }
+    return 0;
   }
-  return 0;
-}
-// ...existing code...
 
   function resetCampos() {
     edad = 0;
@@ -225,7 +224,7 @@ Puntaje Final Redondeado: ${Math.round(puntajeFinal).toFixed(1)} → ${estado}
         {/if}
       </div>
 
-      <label for="altura">Altura (m):</label>
+      <label for="altura">Altura (cm):</label>
       <input
         type="number"
         bind:value={altura}
@@ -283,7 +282,7 @@ Puntaje Final Redondeado: ${Math.round(puntajeFinal).toFixed(1)} → ${estado}
     font-family: Comfortaa;
     font-style: normal;
     font-weight: 400;
-    src: url(/Comfortaa.ttf);
+    src: url("/Comfortaa.ttf");
   }
 
   :global(body) {
