@@ -1,7 +1,16 @@
-# Tauri + SvelteKit + TypeScript
 
-This template should help get you started developing with Tauri, SvelteKit and TypeScript in Vite.
+Pequeña app **Bun + SvelteKit** para calcular los puntajes de las pruebas físicas.
 
-## Recommended IDE Setup
 
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer).
+### Requisitos previos
+
+- [Node.js](https://nodejs.org/) o [Bun](https://bun.sh/)
+- [Git](https://git-scm.com/)
+
+### Instalación
+
+```sh
+git clone https://github.com/tu-usuario/pruebas-fisicas-app.git
+cd pruebas-fisicas-app
+bun install
+bun run dev
