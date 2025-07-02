@@ -7,26 +7,38 @@
 
   type Sexo = "masculino" | "femenino";
 
-  let edad = 0;
-  let añoNacimiento = "";
-  let sexo: Sexo = "masculino";
+  let edad = $state(0);
+  let añoNacimiento = $state("");
+  let sexo: Sexo = $state("masculino");
 
-  let altura: number | null = null;
-  let peso: number | null = null;
-  let imc: number | null = null;
-  let imcTexto = "";
-  let cc: number | null = null;
-  let penalizacion = 0;
+  let altura: number | null = $state(null);
+  let peso: number | null = $state(null);
+  let imc: number | null = $state(null);
+  let imcTexto = $state("");
+  let cc: number | null = $state(null);
+  let penalizacion = $state(0);
 
-  let correr2400 = "";
-  let flexionesBrazo = "";
-  let abdominales = "";
-  let barra = "";
-  let pierna = "";
-  let cabo = false;
+  let correr2400 = $state("");
+  let flexionesBrazo = $state("");
+  let abdominales = $state("");
+  let barra = $state("");
+  let pierna = $state("");
+  let cabo = $state(false);
 
-  let resultado = "";
-  let datos: any = null;
+  let resultado = $state("");
+  let datos: any = $state(null);
+  let showEmailForm = $state(false);
+
+  $effect(() => {
+    if (showEmailForm) {
+      document.body.style.overflow = "hidden";
+      console.log("Formulario de email abierto");
+    } else {
+      document.body.style.overflow = "auto";
+
+      console.log("Formulario de email cerrado");
+    }
+  });
 
   onMount(async () => {
     const res = await fetch(`${base}/pruebas_fisicas.json`);
@@ -169,6 +181,25 @@
     sessionStorage.removeItem("datosFormulario");
   }
 
+  function toggleEmailForm() {
+    showEmailForm = !showEmailForm;
+  }
+
+  function sendEmail(event: Event) {
+    event.preventDefault();
+    const form = event.target as HTMLFormElement;
+    const formData = new FormData(form);
+
+    const subject = formData.get("subject") as string;
+    const message = formData.get("message") as string;
+
+    const mailtoLink = `mailto:naga_1252@proton.me?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
+    window.location.href = mailtoLink;
+
+    // Cerrar el formulario después de enviar
+    showEmailForm = false;
+  }
+
   function evaluar() {
     if (!datos) {
       alert("❌ Error: Datos no cargados. Por favor, recarga la página.");
@@ -302,6 +333,18 @@
     <p class="subtitle">Sistema Nuevo</p>
     <div class="header-controls">
       <SelectorTema />
+      <button
+        class="email-button"
+        title="Enviar correo"
+        aria-label="Enviar correo"
+        onclick={toggleEmailForm}
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.89 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"
+          />
+        </svg>
+      </button>
       <a
         href="https://github.com/Naga-Nag/pruebas-fisicas-app"
         target="_blank"
@@ -319,6 +362,79 @@
     </div>
   </header>
 
+  <!-- Formulario de email plegable -->
+  {#if showEmailForm}
+    <div
+      class="email-form-overlay"
+      role="button"
+      tabindex="0"
+      aria-label="Cerrar formulario de correo"
+      onclick={toggleEmailForm}
+      onkeydown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          toggleEmailForm();
+        }
+      }}
+    >
+      <div
+        class="email-form-container"
+        role="dialog"
+        aria-modal="true"
+        tabindex="0"
+        onclick={(e) => e.stopPropagation()}
+        onkeydown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            toggleEmailForm();
+          }
+        }}
+      >
+        <div class="email-form-header">
+          <h3>✉️ Enviar correo</h3>
+          <button
+            class="close-button"
+            onclick={toggleEmailForm}
+            aria-label="Cerrar formulario"
+            type="button">✕</button
+          >
+        </div>
+        <form onsubmit={sendEmail} class="email-form">
+          <div class="form-group">
+            <label for="subject">Asunto:</label>
+            <input
+              type="text"
+              id="subject"
+              name="subject"
+              placeholder="Asunto del mensaje"
+              required
+              class="form-input"
+            />
+          </div>
+          <div class="form-group">
+            <label for="message">Mensaje:</label>
+            <textarea
+              id="message"
+              name="message"
+              placeholder="Escribe tu mensaje..."
+              rows="6"
+              required
+              class="form-textarea"
+            ></textarea>
+          </div>
+          <div class="form-actions">
+            <button
+              type="button"
+              class="btn-secondary"
+              onclick={toggleEmailForm}
+            >
+              Cancelar
+            </button>
+            <button type="submit" class="btn-primary"> 📧 Enviar </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  {/if}
+
   <div class="main-content">
     <!-- Sección de Datos Personales -->
     <div class="section-card">
@@ -335,7 +451,7 @@
               type="radio"
               value="masculino"
               bind:group={sexo}
-              on:change={guardarDatos}
+              onchange={guardarDatos}
             />
             <span>👨 Masculino</span>
           </label>
@@ -344,7 +460,7 @@
               type="radio"
               value="femenino"
               bind:group={sexo}
-              on:change={guardarDatos}
+              onchange={guardarDatos}
             />
             <span>👩 Femenino</span>
           </label>
@@ -360,7 +476,7 @@
               bind:value={añoNacimiento}
               placeholder="Ej: 2001"
               type="text"
-              on:input={() => {
+              oninput={() => {
                 const year = new Date().getFullYear();
                 const parsed = parseInt(añoNacimiento);
                 edad = isNaN(parsed) ? 0 : year - parsed;
@@ -391,7 +507,7 @@
             bind:value={altura}
             step="0.01"
             placeholder="Ej: 175.5"
-            on:input={() => {
+            oninput={() => {
               actualizarIMC();
               guardarDatos();
             }}
@@ -405,7 +521,7 @@
             type="number"
             bind:value={peso}
             placeholder="Ej: 70.5"
-            on:input={() => {
+            oninput={() => {
               actualizarIMC();
               guardarDatos();
             }}
@@ -421,7 +537,7 @@
             type="number"
             bind:value={cc}
             placeholder="Ej: 80"
-            on:input={() => {
+            oninput={() => {
               actualizarIMC();
               guardarDatos();
             }}
@@ -459,7 +575,7 @@
             bind:value={correr2400}
             placeholder="Ej: 10:30"
             type="text"
-            on:input={guardarDatos}
+            oninput={guardarDatos}
           />
         </div>
 
@@ -472,7 +588,7 @@
             bind:value={flexionesBrazo}
             type="number"
             placeholder="Ej: 25"
-            on:input={guardarDatos}
+            oninput={guardarDatos}
           />
         </div>
 
@@ -483,7 +599,7 @@
             bind:value={abdominales}
             type="number"
             placeholder="Ej: 40"
-            on:input={guardarDatos}
+            oninput={guardarDatos}
           />
         </div>
 
@@ -494,7 +610,7 @@
             bind:value={barra}
             type="number"
             placeholder="Ej: 8"
-            on:input={guardarDatos}
+            oninput={guardarDatos}
           />
         </div>
 
@@ -508,24 +624,24 @@
             type="number"
             step="0.1"
             placeholder="Ej: 4"
-            on:input={guardarDatos}
+            oninput={guardarDatos}
           />
         </div>
       </div>
 
       <div class="checkbox-item">
-        <input type="checkbox" bind:checked={cabo} on:change={guardarDatos} />
+        <input type="checkbox" bind:checked={cabo} onchange={guardarDatos} />
         <span>🎖️ ¿Sube el cabo?</span>
       </div>
     </div>
 
     <!-- Botones de acción -->
     <div class="section-card">
-      <button class="btn-primary" on:click={evaluar}>
+      <button class="btn-primary" onclick={evaluar}>
         ✅ Evaluar Pruebas Físicas
       </button>
 
-      <button class="btn-secondary" on:click={resetCampos}>
+      <button class="btn-secondary" onclick={resetCampos}>
         🧹 Limpiar todos los campos
       </button>
     </div>
@@ -535,6 +651,13 @@
 <style>
   /* Estilos específicos para esta página */
 
+  .header-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .email-button,
   .github-button {
     display: flex;
     align-items: center;
@@ -547,7 +670,13 @@
     border: 1px solid var(--color-border);
     transition: all 0.2s ease;
     text-decoration: none;
-    margin-left: 0.5rem;
+    cursor: pointer;
+  }
+
+  .email-button:hover {
+    background: #0066cc;
+    color: white;
+    transform: translateY(-1px);
   }
 
   .github-button:hover {
@@ -556,12 +685,126 @@
     transform: translateY(-1px);
   }
 
+  .email-button svg,
   .github-button svg {
     transition: transform 0.2s ease;
   }
 
+  .email-button:hover svg,
   .github-button:hover svg {
     transform: scale(1.1);
+  }
+
+  /* Formulario de email plegable */
+  .email-form-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.2s ease;
+  }
+
+  .email-form-container {
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    padding: 1.5rem;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    border: 1px solid var(--color-border);
+    animation: slideIn 0.3s ease;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    position: absolute;
+    top: 0;
+  }
+
+  .email-form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 1rem;
+  }
+
+  .email-form-header h3 {
+    margin: 0;
+    color: var(--color-text);
+  }
+
+  .close-button {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--color-text);
+    transition: color 0.2s ease;
+  }
+
+  .close-button:hover {
+    color: #ff4444;
+  }
+
+  .email-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .form-group label {
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .form-textarea {
+    resize: vertical;
+    min-height: 120px;
+    padding: 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background: var(--color-background);
+    color: var(--color-text);
+    font-family: inherit;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 1rem;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   /* Ajustes para medios pequeños */
