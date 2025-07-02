@@ -192,7 +192,7 @@
     }
 
     // Validar que todos los campos estén completos
-    if (!flexionesBrazo || !abdominales || !barra || !pierna) {
+    if (!flexionesBrazo || !abdominales || !pierna) {
       alert(
         "❌ Error: Por favor, completa todos los campos de las pruebas físicas",
       );
