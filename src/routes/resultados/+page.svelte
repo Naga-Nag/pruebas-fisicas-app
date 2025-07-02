@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { base } from "$app/paths";
   import { onMount } from 'svelte';
   import SelectorTema from "$lib/Componentes/SelectorTema.svelte";
 
@@ -31,7 +31,7 @@
   function nuevaEvaluacion() {
     sessionStorage.removeItem('resultados');
     sessionStorage.removeItem('datosFormulario');
-    window.location.href = '/';
+    window.location.href = `${base}/`;
   }
 </script>
 
