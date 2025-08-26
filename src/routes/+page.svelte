@@ -269,12 +269,33 @@
     puntajeFinal += penalizacionFinal;
 
     const puntajeRedondeado = Math.round(puntajeFinal);
-    const aprobado = puntajeRedondeado >= 52;
+
+    // Evaluar subgrupos de aprobación (cada uno debe tener >= 52 puntos)
+    const resistenciaAprobada = p2400 >= 52;
+    const fuerzaAprobada = fuerza >= 52;
+    const flexibilidadAprobada = ppierna >= 52;
+
+    // Contar cuántos subgrupos están desaprobados
+    const subgruposDesaprobados = [
+      !resistenciaAprobada,
+      !fuerzaAprobada,
+      !flexibilidadAprobada
+    ].filter(Boolean).length;
+
+    // Se desaprueba si tiene 2 o más subgrupos desaprobados
+    const aprobadoPorSubgrupos = subgruposDesaprobados < 2;
+    
+    // Aprobación final: puntaje >= 52 Y máximo 1 subgrupo desaprobado
+    const aprobado = puntajeRedondeado >= 52 && aprobadoPorSubgrupos;
 
     let observaciones = "";
-    if (p2400 < 52 && fuerza < 52) {
-      observaciones =
-        "Debe aprobar al menos 2400m o fuerza para ser considerado apto";
+    if (!aprobadoPorSubgrupos) {
+      observaciones = `Desaprobado por tener ${subgruposDesaprobados} subgrupos reprobados. `;
+      if (!resistenciaAprobada) observaciones += "Resistencia: " + p2400 + " pts. ";
+      if (!fuerzaAprobada) observaciones += "Fuerza: " + fuerza.toFixed(1) + " pts. ";
+      if (!flexibilidadAprobada) observaciones += "Flexibilidad: " + ppierna + " pts. ";
+    } else if (puntajeRedondeado < 52) {
+      observaciones = "Puntaje final insuficiente (mínimo 52 puntos)";
     }
 
     // Preparar datos para la página de resultados
@@ -313,11 +334,20 @@
         fuerzaPromedio: fuerza.toFixed(1),
       },
 
+      // Estado de subgrupos
+      subgrupos: {
+        resistencia: { puntaje: p2400, aprobado: resistenciaAprobada },
+        fuerza: { puntaje: parseFloat(fuerza.toFixed(1)), aprobado: fuerzaAprobada },
+        flexibilidad: { puntaje: ppierna, aprobado: flexibilidadAprobada },
+        desaprobados: subgruposDesaprobados
+      },
+
       // Resultado final
       penalizacion: penalizacionFinal,
       puntajeFinal: puntajeFinal.toFixed(1),
       puntajeRedondeado,
       aprobado,
+      aprobadoPorSubgrupos,
       observaciones,
     };
 

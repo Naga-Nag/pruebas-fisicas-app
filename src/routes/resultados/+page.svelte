@@ -108,7 +108,7 @@
       <!-- Resultados por categoría -->
       <div class="results-grid">
         <!-- Resistencia -->
-        <div class="result-card cardio">
+        <div class="result-card cardio {resultados.subgrupos?.resistencia?.aprobado ? 'approved' : 'rejected'}">
           <div class="result-icon">🏃‍♂️</div>
           <div class="result-content">
             <h4>Resistencia Cardiovascular</h4>
@@ -117,11 +117,14 @@
               <span class="score-label">puntos</span>
             </div>
             <p class="test-detail">Carrera 2400m: {resultados.tiempos.carrera}</p>
+            <div class="subgroup-status {resultados.subgrupos?.resistencia?.aprobado ? 'approved' : 'rejected'}">
+              {resultados.subgrupos?.resistencia?.aprobado ? '✅ Aprobado' : '❌ Desaprobado'}
+            </div>
           </div>
         </div>
 
         <!-- Flexibilidad -->
-        <div class="result-card flexibility">
+        <div class="result-card flexibility {resultados.subgrupos?.flexibilidad?.aprobado ? 'approved' : 'rejected'}">
           <div class="result-icon">🦵</div>
           <div class="result-content">
             <h4>Flexibilidad</h4>
@@ -130,11 +133,14 @@
               <span class="score-label">puntos</span>
             </div>
             <p class="test-detail">Elevación pierna: {resultados.valores.pierna}s</p>
+            <div class="subgroup-status {resultados.subgrupos?.flexibilidad?.aprobado ? 'approved' : 'rejected'}">
+              {resultados.subgrupos?.flexibilidad?.aprobado ? '✅ Aprobado' : '❌ Desaprobado'}
+            </div>
           </div>
         </div>
 
         <!-- Fuerza -->
-        <div class="result-card strength">
+        <div class="result-card strength {resultados.subgrupos?.fuerza?.aprobado ? 'approved' : 'rejected'}">
           <div class="result-icon">💪</div>
           <div class="result-content">
             <h4>Fuerza Muscular</h4>
@@ -155,6 +161,9 @@
                 <span>🤲 Barras:</span>
                 <span>{resultados.puntajes.barra} pts ({resultados.valores.barra})</span>
               </div>
+            </div>
+            <div class="subgroup-status {resultados.subgrupos?.fuerza?.aprobado ? 'approved' : 'rejected'}">
+              {resultados.subgrupos?.fuerza?.aprobado ? '✅ Aprobado' : '❌ Desaprobado'}
             </div>
           </div>
         </div>
@@ -200,6 +209,35 @@
           </div>
 
           <div class="final-status-section">
+            {#if resultados.subgrupos}
+              <div class="subgroups-summary">
+                <h4>📋 Resumen por subgrupos:</h4>
+                <div class="subgroups-grid">
+                  <div class="subgroup-item {resultados.subgrupos.resistencia.aprobado ? 'approved' : 'rejected'}">
+                    <span>🏃‍♂️ Resistencia:</span>
+                    <span>{resultados.subgrupos.resistencia.puntaje} pts</span>
+                    <span>{resultados.subgrupos.resistencia.aprobado ? '✅' : '❌'}</span>
+                  </div>
+                  <div class="subgroup-item {resultados.subgrupos.fuerza.aprobado ? 'approved' : 'rejected'}">
+                    <span>💪 Fuerza:</span>
+                    <span>{resultados.subgrupos.fuerza.puntaje} pts</span>
+                    <span>{resultados.subgrupos.fuerza.aprobado ? '✅' : '❌'}</span>
+                  </div>
+                  <div class="subgroup-item {resultados.subgrupos.flexibilidad.aprobado ? 'approved' : 'rejected'}">
+                    <span>🦵 Flexibilidad:</span>
+                    <span>{resultados.subgrupos.flexibilidad.puntaje} pts</span>
+                    <span>{resultados.subgrupos.flexibilidad.aprobado ? '✅' : '❌'}</span>
+                  </div>
+                </div>
+                <p class="subgroups-rule">
+                  ⚠️ Se requiere aprobar al menos 2 de 3 subgrupos (máximo 1 desaprobado)
+                </p>
+                <p class="subgroups-status">
+                  Subgrupos desaprobados: <strong>{resultados.subgrupos.desaprobados}/3</strong>
+                </p>
+              </div>
+            {/if}
+            
             <div class="status-badge {resultados.aprobado ? 'approved' : 'rejected'}">
               {#if resultados.aprobado}
                 <span class="status-icon">✅</span>
@@ -305,6 +343,94 @@
     display: flex;
     align-items: center;
     gap: 1rem;
+  }
+  
+  .result-card.approved {
+    border-left: 4px solid var(--success-color);
+    background: linear-gradient(45deg, var(--bg-secondary), rgba(76, 175, 80, 0.05));
+  }
+  
+  .result-card.rejected {
+    border-left: 4px solid var(--text-error);
+    background: linear-gradient(45deg, var(--bg-secondary), rgba(244, 67, 54, 0.05));
+  }
+  
+  .subgroup-status {
+    margin-top: 0.75rem;
+    padding: 0.5rem;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  
+  .subgroup-status.approved {
+    background: rgba(76, 175, 80, 0.1);
+    color: var(--success-color);
+    border: 1px solid var(--success-color);
+  }
+  
+  .subgroup-status.rejected {
+    background: rgba(244, 67, 54, 0.1);
+    color: var(--text-error);
+    border: 1px solid var(--text-error);
+  }
+  
+  .subgroups-summary {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: var(--bg-tertiary);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+  }
+  
+  .subgroups-summary h4 {
+    margin: 0 0 1rem 0;
+    color: var(--text-accent);
+    text-align: center;
+  }
+  
+  .subgroups-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .subgroup-item {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    border-radius: 8px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+  }
+  
+  .subgroup-item.approved {
+    border-color: var(--success-color);
+    background: rgba(76, 175, 80, 0.05);
+  }
+  
+  .subgroup-item.rejected {
+    border-color: var(--text-error);
+    background: rgba(244, 67, 54, 0.05);
+  }
+  
+  .subgroups-rule {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    text-align: center;
+    margin: 0.5rem 0;
+    font-style: italic;
+  }
+  
+  .subgroups-status {
+    text-align: center;
+    font-weight: 600;
+    color: var(--text-accent);
+    margin: 0;
   }
   
   .result-icon {
@@ -485,6 +611,11 @@
     
     .score-item {
       flex: 1;
+    }
+    
+    .subgroups-grid {
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1rem;
     }
   }
   
